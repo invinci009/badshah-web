@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env.local
+.env
+*.mp4
+.vercel
+.env*
+
+firebase-service-account*.json
+.firebase-service-account*

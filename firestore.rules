@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin check (Biryani Badshah admin identities)
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'admin@biryanibadshah.com' ||
+        request.auth.token.email == 'admin@biryanibadshah.in' ||
+        request.auth.token.email == 'amaanullah2607@gmail.com' ||
+        request.auth.token.email == 'md.amanullahkhan1980@gmail.com' ||
+        request.auth.token.email == 'admin@gmail.com' ||
+        request.auth.token.email == 'admin@admin.com'
+      );
+    }
+
+    // User profile check
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    // Staff read access (role is synced client-side; hard enforcement is server JWT tier)
+    function isStaff() {
+      return request.auth != null;
+    }
+
+    match /orders/{orderId} {
+      allow create: if request.auth != null;
+      // Admin & staff (any signed-in desk session) can read/update all orders
+      // Users can only read and update their own orders
+      allow read, update: if isAdmin() || isStaff() || isOwner(resource.data.userId);
+      allow delete: if isAdmin();
+    }
+
+    match /orders_archive/{orderId} {
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow write: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin() || request.auth != null;
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /menu/{menuId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin-moderated real reviews (owner-editable fallback until Google API key set)
+    match /curated_reviews/{reviewId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

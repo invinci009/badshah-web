@@ -1,0 +1,21 @@
+{
+  "name": "biryani-badshah",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "reset": "node clear.mjs"
+  },
+  "dependencies": {
+    "cookie": "^2.0.1",
+    "firebase": "^12.16.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.8.0",
+    "next": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "web-push": "^3.6.7"
+  }
+}

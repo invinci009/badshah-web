@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /my-orders
+Disallow: /profile
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://www.biryanibadshah.in/sitemap.xml

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project</title>
+  <meta property="og:title" content="Your Amazing Page Title">
+<meta property="og:description" content="A brief, catchy description of what people will find when they click your link.">
+<meta property="og:image" content="D:\work\biryani\public\hero-biryani-nobg.png">
+<meta property="og:url" content="https://instagram.com">
+<meta property="og:type" content="website">
+
+  <meta name="description" content="Biryani Badshah - Dum Pukht biryani, slow-cooked over real fire." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=DM+Sans:wght@400;500;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Patrick+Hand&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <nav class="nav container" aria-label="Primary navigation">
+      <a href="#top" class="logo" aria-label="Biryani Badshah home">BIRYANI <span>BADSHAH</span></a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-right" id="navLinks">
+        <a href="#menu">MENU</a>
+        <a href="#about">ABOUT</a>
+        <a href="#order">ORDER</a>
+        <a href="#contact">CONTACT</a>
+        <a href="#order" class="btn cta">ORDER NOW</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section-pad" id="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="meta">EST. 2024 · BHUBANESWAR</p>
+          <h1 class="hero-title" aria-label="DUM PUKHT. SLOW FIRE.">
+            <span class="line line-one">
+              <span class="word">DUM</span>
+              <span class="word">PUKHT.</span>
+            </span>
+            <span class="line line-two">
+              <span class="word">SLOW</span>
+              <span class="word">FIRE.</span>
+            </span>
+          </h1>
+          <p class="hero-sub">Hyderabadi Biryani. Cooked the old way.</p>
+          <div class="hero-actions">
+            <a href="#order" class="btn">ORDER NOW</a>
+            <span class="hero-badge">30 MIN AVG DELIVERY</span>
+          </div>
+        </div>
+
+        <!-- hero media: circular biryani image -->
+        <div class="hero-media">
+          <div class="hero-plate" role="img" aria-label="Hyderabadi Biryani">
+            <img src="photo-1563379091339-03b21ab4a4f8.avif" alt="Hyderabadi Biryani" loading="eager" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="marquee marquee-one" aria-label="Announcement ticker">
+      <div class="marquee-track reverse">
+        <span>BIRYANI BADSHAH · DUM PUKHT · HYDERABADI · EST. 2024 · FREE DELIVERY · ORDER NOW ·</span>
+        <span>BIRYANI BADSHAH · DUM PUKHT · HYDERABADI · EST. 2024 · FREE DELIVERY · ORDER NOW ·</span>
+      </div>
+    </section>
+
+    <section class="about section-pad reveal" id="about">
+      <div class="container about-grid">
+        <div class="about-copy">
+          <p class="section-label">THE PHILOSOPHY</p>
+          <h3 class="display">BIRYANI EK
+<span>IBADAT HAI</span> <br/> <span>Shiddat hai</span></h3>
+          <p class="about-lead">Biryani Badshah started with one obsession — 
+the perfect dum biryani. Every grain sealed. 
+Every spice measured. Every pot slow-cooked 
+the way it's been done for four hundred years. 
+We don't rush it. We never will. Our speciality : <strong>Biryani.</strong></p>
+        </div>
+
+        <div class="about-media-wrap">
+          <div class="about-gallery">
+            <figure class="about-photo">
+              <img src="photo-1633945274309-2c16c9682a8c.avif" alt="Paput sign" loading="lazy" />
+            </figure>
+            <figure class="about-photo">
+              <img src="photo-1631515243349-e0cb75fb8d3a.avif" alt="Paput terrace" loading="lazy" />
+            </figure>
+          </div>
+          <a class="about-signature" href="https://instagram.com/_.amanullah" target="_blank" rel="noopener noreferrer">@_.amanullah</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="social-proof section-pad reveal" aria-label="Customer highlights">
+      <div class="container proof-grid">
+        <article class="proof-card">
+          <p class="proof-rating">4.8/5</p>
+          <p class="proof-copy">Loved for the aroma, portion size, and the clean spice balance.</p>
+        </article>
+        <article class="proof-card">
+          <p class="proof-rating">1.2K+</p>
+          <p class="proof-copy">Orders served across Bhubaneswar with repeat customers every day.</p>
+        </article>
+        <article class="proof-card quote-card">
+          <p class="proof-quote">“The closest thing to a proper dum pot I’ve had in the city.”</p>
+          <p class="proof-author">- Local foodie review</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="menu section-pad reveal" id="menu">
+      <div class="container">
+        <p class="section-label menu-label">OUR MENU</p>
+        <h2 class="display menu-title">THE BIRYANI <span>BOARD.</span></h2>
+
+        <div class="menu-chips" role="tablist" aria-label="Filter menu items">
+          <button class="chip active" type="button" data-filter="all">All</button>
+          <button class="chip" type="button" data-filter="chicken">Chicken</button>
+          <button class="chip" type="button" data-filter="mutton">Mutton</button>
+          <button class="chip" type="button" data-filter="veg">Veg</button>
+          <button class="chip" type="button" data-filter="seafood">Seafood</button>
+          <button class="chip" type="button" data-filter="bestseller">Bestseller</button>
+        </div>
+
+        <div class="menu-grid">
+          <article class="menu-card" tabindex="0" role="button" aria-label="Open Hyderabadi Chicken Dum Biryani details" data-title="Hyderabadi Chicken Dum Biryani" data-price="₹249" data-category="chicken bestseller" data-tags="Bestseller, Chicken, Signature" data-spice="Medium" data-time="25-30 min" data-portion="1-2 people" data-description="The original. Slow-cooked, sealed, and smoky." data-image="photo-1633945274309-2c16c9682a8c.avif">
+            <div class="dish-media">
+              <img src="photo-1633945274309-2c16c9682a8c.avif" alt="Hyderabadi Chicken Dum Biryani" loading="lazy" />
+              <span>HYDERABADI CHICKEN</span>
+            </div>
+            <div class="menu-body">
+              <div class="menu-head"><h3>Hyderabadi Chicken Dum Biryani</h3><strong>₹249</strong></div>
+              <p>The original. Slow-cooked, sealed, and smoky.</p>
+            </div>
+          </article>
+
+          <article class="menu-card" tabindex="0" role="button" aria-label="Open Mutton Dum Biryani details" data-title="Mutton Dum Biryani" data-price="₹329" data-category="mutton bestseller" data-tags="Bestseller, Mutton, Slow Cooked" data-spice="High" data-time="35-40 min" data-portion="1-2 people" data-description="Tender cuts, whole spices, and 3 hours of patience." data-image="photo-1631515243349-e0cb75fb8d3a.avif">
+            <div class="dish-media">
+              <img src="photo-1631515243349-e0cb75fb8d3a.avif" alt="Mutton Dum Biryani" loading="lazy" />
+              <span>MUTTON DUM</span>
+            </div>
+            <div class="menu-body">
+              <div class="menu-head"><h3>Mutton Dum Biryani</h3><strong>₹329</strong></div>
+              <p>Tender cuts, whole spices, and 3 hours of patience.</p>
+            </div>
+          </article>
+
+          <article class="menu-card" tabindex="0" role="button" aria-label="Open Egg Biryani details" data-title="Egg Biryani" data-price="₹179" data-category="veg bestseller" data-tags="Bestseller, Quick Pick" data-spice="Low" data-time="20-25 min" data-portion="1 person" data-description="Perfectly spiced basmati with golden fried eggs." data-image="photo-1599043513900-ed6fe01d3833.avif">
+            <div class="dish-media">
+              <img src="photo-1599043513900-ed6fe01d3833.avif" alt="Egg Biryani" loading="lazy" />
+              <span>EGG BIRYANI</span>
+            </div>
+            <div class="menu-body">
+              <div class="menu-head"><h3>Egg Biryani</h3><strong>₹179</strong></div>
+              <p>Perfectly spiced basmati with golden fried eggs.</p>
+            </div>
+          </article>
+
+          <article class="menu-card" tabindex="0" role="button" aria-label="Open Paneer Biryani details" data-title="Paneer Biryani" data-price="₹199" data-category="veg" data-tags="Vegetarian, Mild" data-spice="Low" data-time="20-25 min" data-portion="1 person" data-description="Smoky cottage cheese layered into fragrant rice." data-image="photo-1596797038530-2c107229654b.avif">
+            <div class="dish-media">
+              <img src="photo-1596797038530-2c107229654b.avif" alt="Paneer Biryani" loading="lazy" />
+              <span>PANEER BIRYANI</span>
+            </div>
+            <div class="menu-body">
+              <div class="menu-head"><h3>Paneer Biryani</h3><strong>₹199</strong></div>
+              <p>Smoky cottage cheese layered into fragrant rice.</p>
+            </div>
+          </article>
+
+          <article class="menu-card" tabindex="0" role="button" aria-label="Open Prawn Biryani details" data-title="Prawn Biryani" data-price="₹369" data-category="seafood bestseller" data-tags="Seafood, Bestseller, Coastal" data-spice="Medium" data-time="30-35 min" data-portion="1-2 people" data-description="Coastal-style, coconut-kissed, heat-packed." data-image="photo-1589302168068-964664d93dc0.avif">
+            <div class="dish-media">
+              <img src="photo-1589302168068-964664d93dc0.avif" alt="Prawn Biryani" loading="lazy" />
+              <span>PRAWN BIRYANI</span>
+            </div>
+            <div class="menu-body">
+              <div class="menu-head"><h3>Prawn Biryani</h3><strong>₹369</strong></div>
+              <p>Coastal-style, coconut-kissed, heat-packed.</p>
+            </div>
+          </article>
+
+          <article class="menu-card" tabindex="0" role="button" aria-label="Open Veg Dum Biryani details" data-title="Veg Dum Biryani" data-price="₹169" data-category="veg" data-tags="Vegetarian, Light" data-spice="Low" data-time="18-22 min" data-portion="1 person" data-description="Seasonal vegetables, saffron, and kewra water." data-image="photo-1563379091339-03b21ab4a4f8.avif">
+            <div class="dish-media">
+              <img src="photo-1563379091339-03b21ab4a4f8.avif" alt="Veg Dum Biryani" loading="lazy" />
+              <span>VEG DUM BIRYANI</span>
+            </div>
+            <div class="menu-body">
+              <div class="menu-head"><h3>Veg Dum Biryani</h3><strong>₹169</strong></div>
+              <p>Seasonal vegetables, saffron, and kewra water.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="marquee marquee-two" aria-label="Cuisine ticker">
+      <div class="marquee-track">
+        <span>HYDERABADI · LUCKNOWI · KOLKATA STYLE · FRESH DAILY · NO COMPROMISE · BIRYANI BADSHAH ·</span>
+        <span>HYDERABADI · LUCKNOWI · KOLKATA STYLE · FRESH DAILY · NO COMPROMISE · BIRYANI BADSHAH ·</span>
+      </div>
+    </section>
+
+    <section class="why section-pad reveal" id="why-us">
+      <div class="container">
+        <h2 class="display">THE DIFFERENCE IS IN THE <span>DUM.</span></h2>
+        <div class="stats-grid">
+          <article>
+            <h3><span class="stat-number" data-count="3" data-label="">0</span><span class="stat-unit"> HOURS</span></h3>
+            <p>Every pot is slow-cooked, sealed with atta dough.</p>
+          </article>
+          <article>
+            <h3><span class="stat-number" data-count="100" data-label="%">0</span><span class="stat-unit"> HALAL</span></h3>
+            <p>Sourced fresh, certified daily.</p>
+          </article>
+          <article>
+            <h3><span class="stat-number" data-count="2" data-label="">0</span><span class="stat-unit"> LOCATIONS</span></h3>
+            <p>Bhubaneswar &amp; delivery across the city.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="order section-pad reveal" id="order">
+      <div class="container">
+        <p class="section-label">FIND US</p>
+        <h2 class="display">DINE IN. OR <span>BRING THE FIRE HOME.</span></h2>
+
+        <div class="order-grid" id="contact">
+          <article class="contact-card">
+            <div class="icon-square" aria-hidden="true">
+              <!-- Fork and knife SVG -->
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M6 2v6" stroke="#F4A460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 2v6" stroke="#F4A460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 10c0 2 1.5 3 4 3s4-1 4-3V2" stroke="#F4A460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>DINE IN</h3>
+            <p>Plot 42, Saheed Nagar, Bhubaneswar</p>
+            <p class="hours">Mon–Sun: 11:00 AM – 11:00 PM</p>
+            <a href="#" class="text-link">GET DIRECTIONS →</a>
+          </article>
+
+          <article class="contact-card delivery">
+            <div class="icon-square" aria-hidden="true">
+              <!-- Scooter/delivery SVG -->
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M3 13h6l3-6h6v6" stroke="#F4A460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="7" cy="18" r="2" stroke="#F4A460" stroke-width="2"/>
+                <circle cx="18" cy="18" r="2" stroke="#F4A460" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3>DELIVERY</h3>
+            <p>Zomato · Swiggy · Direct Order</p>
+            <p class="hours">Free over ₹499 · 30 min avg</p>
+            <a href="#order" class="btn">ORDER NOW</a>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="sticky-actions" aria-label="Quick actions">
+    <a href="#order" class="sticky-action primary">ORDER NOW</a>
+    <a href="#menu" class="sticky-action">MENU</a>
+    <a href="tel:+910000000000" class="sticky-action">CALL</a>
+  </aside>
+
+  <div class="dish-modal" id="dishModal" aria-hidden="true">
+    <div class="dish-modal-backdrop" data-close-modal></div>
+    <div class="dish-modal-panel" role="dialog" aria-modal="true" aria-labelledby="dishModalTitle">
+      <button class="modal-close" type="button" aria-label="Close dish details" data-close-modal>×</button>
+      <img class="dish-modal-image" id="dishModalImage" alt="" />
+      <div class="dish-modal-body">
+        <p class="section-label">SIGNATURE DISH</p>
+        <h2 id="dishModalTitle"></h2>
+        <p id="dishModalDesc"></p>
+        <div class="dish-modal-tags" id="dishModalTags" aria-label="Dish tags"></div>
+        <div class="dish-meta-grid">
+          <div><span>PRICE</span><strong id="dishModalPrice"></strong></div>
+          <div><span>SPICE</span><strong id="dishModalSpice"></strong></div>
+          <div><span>TIME</span><strong id="dishModalTime"></strong></div>
+          <div><span>PORTION</span><strong id="dishModalPortion"></strong></div>
+        </div>
+        <a href="#order" class="btn dish-modal-cta">ORDER THIS</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-row footer-top">
+      <a href="#top" class="logo">BIRYANI <span>BADSHAH</span></a>
+      <div class="socials">
+        <a href="#">INSTAGRAM</a>
+        <a href="#">WHATSAPP</a>
+        <a href="#">ZOMATO</a>
+      </div>
+    </div>
+
+    <div class="container footer-row">
+      <nav class="footer-nav" aria-label="Footer links">
+        <a href="#menu">MENU</a>
+        <a href="#about">ABOUT</a>
+        <a href="#order">ORDER</a>
+        <a href="#contact">CONTACT</a>
+      </nav>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>© 2024 Biryani Badshah · Bhubaneswar, Odisha</p>
+      <p>MADE WITH FIRE 🔥</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
