@@ -374,7 +374,9 @@ export default function LoyaltyPage() {
                 </div>
 
                 <h2 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', fontWeight: 900, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-                  {customer?.name || userProfile?.name || user?.displayName || 'Royal Diner Guest'}
+                  {(customer?.name && customer.name !== 'VIP Diner' && customer.name !== 'VIP Guest' && customer.name !== 'Royal Guest') 
+                    ? customer.name 
+                    : (userProfile?.name || user?.displayName || (user?.email ? user.email.split('@')[0] : 'Royal Diner Guest'))}
                 </h2>
 
                 <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#FCE7F3', opacity: 0.9, fontFamily: 'monospace', fontWeight: 700 }}>

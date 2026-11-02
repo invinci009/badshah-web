@@ -898,11 +898,13 @@ export default function AdminLoyaltyDesk() {
                     filteredCustomers.map((c) => (
                       <tr key={c.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                         <td style={{ padding: '12px 14px', fontWeight: 800, color: 'var(--ink)' }}>
-                          <div>{c.name}</div>
+                          <div style={{ fontSize: '0.92rem', color: '#111827', fontWeight: 800 }}>
+                            {c.name && c.name !== 'VIP Diner' ? c.name : (c.email ? c.email.split('@')[0] : 'Guest Diner')}
+                          </div>
                           {c.email && <span style={{ fontSize: '0.72rem', color: 'var(--muted)', fontWeight: 600 }}>{c.email}</span>}
                         </td>
                         <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontWeight: 700 }}>
-                          {c.phone ? `+91 ${c.phone}` : '-'}
+                          {/^\d{10}$/.test(c.phone) ? `+91 ${c.phone}` : (c.phone && !c.phone.startsWith('wla_') && c.phone.length < 15 ? c.phone : <span style={{ color: '#9CA3AF', fontSize: '0.75rem', fontStyle: 'italic', fontFamily: 'inherit' }}>Not registered</span>)}
                         </td>
                         <td style={{ padding: '12px 14px' }}>
                           <span
