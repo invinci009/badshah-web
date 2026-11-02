@@ -208,26 +208,23 @@ export default function MyOrdersPage() {
     }
   }
 
-  const standardSteps = ['Order Placed', 'Payment Verified', 'Accepted', 'Preparing', 'Ready', 'Out For Delivery', 'Delivered']
+  const standardSteps = ['Order Placed', 'Confirmed', 'Preparing', 'Ready', 'Out For Delivery', 'Delivered']
 
   const getStandardStepIndex = (order) => {
     const rawSt = (order.orderStatus || order.status || '').toLowerCase()
-    const paySt = (order.paymentStatus || '').toLowerCase()
 
-    if (rawSt === 'delivered') return 6
-    if (rawSt === 'out_for_delivery' || rawSt === 'out for delivery') return 5
-    if (rawSt === 'ready' || rawSt === 'ready_for_delivery') return 4
-    if (rawSt === 'preparing') return 3
-    if (rawSt === 'accepted' || rawSt === 'confirmed') return 2
-    if (rawSt === 'payment_verified' || paySt === 'paid' || paySt === 'verified' || order.paymentVerifiedBy) return 1
+    if (rawSt === 'delivered') return 5
+    if (rawSt === 'out_for_delivery' || rawSt === 'out for delivery') return 4
+    if (rawSt === 'ready' || rawSt === 'ready_for_delivery') return 3
+    if (rawSt === 'preparing') return 2
+    if (rawSt === 'accepted' || rawSt === 'confirmed' || rawSt === 'payment_verified') return 1
     return 0 // Order Placed
   }
 
   const getStatusEmoji = (step) => {
     const map = {
       'Order Placed': '📋',
-      'Payment Verification Pending': '🔄',
-      'Payment Verified': '✅',
+      'Confirmed': '👍',
       'Accepted': '👍',
       'Preparing': '👨‍🍳',
       'Ready': '🍱',
@@ -326,7 +323,12 @@ export default function MyOrdersPage() {
                         <span style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>{order.createdAt}</span>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        {(order.loyaltyAwarded || (order.orderStatus || '').toLowerCase() === 'delivered') && (
+                          <span style={{ background: 'rgba(245, 197, 24, 0.18)', color: '#92400E', border: '1px solid rgba(245, 197, 24, 0.45)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 900 }}>
+                            👑 +{order.loyaltyPointsEarned || 20} VIP Pts
+                          </span>
+                        )}
                         <span className="status-badge" style={{ background: statusStyle.bg, color: statusStyle.color, border: `1px solid ${statusStyle.border}`, fontWeight: 900 }}>
                           ● {order.orderStatus || 'Confirmed'}
                         </span>
@@ -425,11 +427,38 @@ export default function MyOrdersPage() {
                   <strong style={{ color: '#111827' }}>₹{((Number(item.price) || 0) * (Number(item.qty || item.quantity) || 1)).toFixed(0)}</strong>
                 </div>
               ))}
+
+              {selectedOrder.appliedReward && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.92rem', padding: '12px 16px', background: '#ecfdf5', border: '1.5px dashed #10b981', borderRadius: '12px', color: '#065f46' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '1.1rem' }}>🎁</span>
+                    <div>
+                      <strong style={{ color: '#047857', display: 'block' }}>{selectedOrder.appliedReward.name}</strong>
+                      <span style={{ fontSize: '0.74rem', color: '#059669', fontWeight: 700 }}>VIP Club Top-Up Delicacy</span>
+                    </div>
+                  </span>
+                  <strong style={{ color: '#059669', background: '#d1fae5', padding: '4px 10px', borderRadius: '6px', fontSize: '0.82rem' }}>
+                    FREE (₹0)
+                  </strong>
+                </div>
+              )}
             </div>
 
-            <div style={{ borderTop: '2px solid #e5e7eb', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: '800', color: '#111827' }}>
-              <span>Total Paid</span>
-              <span style={{ color: 'var(--deep-green)' }}>₹{(Number(selectedOrder.grandTotal) || 0).toFixed(0)}</span>
+            <div style={{ borderTop: '2px solid #e5e7eb', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ fontSize: '0.74rem', color: '#6b7280', display: 'block', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>PAYMENT METHOD</span>
+                <strong style={{ fontSize: '0.92rem', color: '#111827', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  💵 Cash on Delivery (COD)
+                </strong>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.74rem', color: (selectedOrder.paymentStatus === 'paid' || (selectedOrder.orderStatus || '').toLowerCase() === 'delivered') ? '#16a34a' : '#b45309', display: 'block', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {(selectedOrder.paymentStatus === 'paid' || (selectedOrder.orderStatus || '').toLowerCase() === 'delivered') ? 'PAID IN CASH' : 'PAYABLE ON DELIVERY'}
+                </span>
+                <span style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--deep-green)' }}>
+                  ₹{(Number(selectedOrder.grandTotal) || 0).toFixed(0)}
+                </span>
+              </div>
             </div>
           </div>
         </div>

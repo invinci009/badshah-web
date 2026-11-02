@@ -44,7 +44,7 @@ export default function MenuPage() {
   const [coName, setCoName] = useState('')
   const [coPhone, setCoPhone] = useState('')
   const [coAddress, setCoAddress] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('UPI')
+  const [paymentMethod, setPaymentMethod] = useState('COD')
   const [coLoading, setCoLoading] = useState(false)
 
   // Persist cart to localStorage
@@ -125,7 +125,7 @@ export default function MenuPage() {
     setCheckoutOpen(true)
   }
 
-  const handlePlaceOrder = async (orderData = {}, utrString = null) => {
+  const handlePlaceOrder = async (orderData = {}) => {
     if (settings?.isStoreOpen === false) {
       alert('🔴 Restaurant is currently closed. We are not accepting online orders right now.')
       return
@@ -134,9 +134,6 @@ export default function MenuPage() {
     const finalName = orderData.name || coName || user?.displayName || user?.email?.split('@')[0]
     const finalPhone = orderData.phone || coPhone
     const finalAddress = orderData.address || coAddress
-    const isUpi = orderData.isUpi !== undefined ? orderData.isUpi : paymentMethod === 'UPI'
-
-    // All online payments are pre-paid UPI (QR code). Sign-in is required below.
 
     if (!finalPhone || !finalAddress) {
       alert('Please enter your phone number and delivery address.')
@@ -146,7 +143,7 @@ export default function MenuPage() {
     try {
       setCoLoading(true)
 
-      // --- STANDARD FLOW (UPI): create order from scratch ---
+      // Sign-in requirement to link order to account
       if (!user) {
         openAuthModal()
         setCoLoading(false)
@@ -157,8 +154,10 @@ export default function MenuPage() {
       const rnd = Math.floor(1000 + Math.random() * 9000).toString()
       const orderId = `BB-PATNA-${ts}-${rnd}`
 
-      const discountValue = orderData.coupon ? orderData.coupon.discount : 0
-      const finalGrandTotal = Math.max(0, grandTotal - discountValue)
+      const couponDiscount = orderData.coupon ? (Number(orderData.coupon.discount) || 0) : 0
+      const loyaltyDiscount = orderData.appliedReward ? (Number(orderData.appliedReward.discount) || 0) : 0
+      const totalDiscountValue = couponDiscount + loyaltyDiscount
+      const finalGrandTotal = Math.max(0, grandTotal - totalDiscountValue)
 
       const payload = {
         orderId,
@@ -172,14 +171,17 @@ export default function MenuPage() {
         subtotal: cartTotal,
         deliveryCharge: deliveryFee,
         tax: 0,
-        discount: discountValue,
+        discount: totalDiscountValue,
+        couponDiscount,
+        loyaltyDiscount,
         appliedCoupon: orderData.coupon ? orderData.coupon.code : null,
+        appliedReward: orderData.appliedReward || null,
         grandTotal: finalGrandTotal,
-        paymentMethod: isUpi ? 'UPI' : 'COD',
-        paymentStatus: isUpi ? 'verification_pending' : 'pending',
-        orderStatus: isUpi ? 'payment_verification_pending' : 'pending',
-        customerMarkedPaid: isUpi ? true : false,
-        transactionReference: utrString || null,
+        paymentMethod: 'COD',
+        paymentStatus: 'pending',
+        orderStatus: 'pending',
+        customerMarkedPaid: false,
+        transactionReference: null,
         paymentVerifiedBy: null,
         paymentVerifiedAt: null,
         rejectionReason: null,

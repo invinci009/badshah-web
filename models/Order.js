@@ -45,15 +45,15 @@ const OrderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    default: 'payment_verification_pending',
+    default: 'pending',
   },
   paymentMethod: {
     type: String,
-    default: 'UPI',
+    default: 'COD',
   },
   paymentStatus: {
     type: String,
-    default: 'verification_pending',
+    default: 'pending',
   },
   customerMarkedPaid: {
     type: Boolean,

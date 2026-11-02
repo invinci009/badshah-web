@@ -70,6 +70,7 @@ export default function AdminLayout({ children, activePage = 'dashboard', title 
     { key: 'all-orders', label: 'All Orders', href: '/admin/all-orders', icon: '📋', minRole: ROLES.CUSTOMER },
     { key: 'menu', label: 'Dish Menu', href: '/admin/menu', icon: '🍛', minRole: ROLES.ADMIN },
     { key: 'coupons', label: 'Coupons', href: '/admin/coupons', icon: '🎟️', minRole: ROLES.ADMIN },
+    { key: 'loyalty', label: 'VIP Loyalty', href: '/admin/loyalty', icon: '👑', minRole: ROLES.ADMIN },
     { key: 'users', label: 'Customers', href: '/admin/users', icon: '👤', minRole: ROLES.ADMIN },
     { key: 'settings', label: 'Settings', href: '/admin/settings', icon: '⚙️', minRole: ROLES.ADMIN },
   ]

@@ -60,9 +60,11 @@ export default function SiteNav({ activePage = 'home' }) {
         <div className={`nav-right ${isNavOpen ? 'open' : ''}`} id="navLinks">
           <Link href="/" className={activePage === 'home' ? 'active' : ''} onClick={() => setIsNavOpen(false)}>HOME</Link>
           <Link href="/menu" className={activePage === 'menu' ? 'active' : ''} onClick={() => setIsNavOpen(false)}>MENU</Link>
-          <a href="/#about" onClick={() => setIsNavOpen(false)}>ABOUT</a>
-          <a href="/#order" onClick={() => setIsNavOpen(false)}>ORDER</a>
           <Link href="/my-orders" className={activePage === 'orders' ? 'active' : ''} onClick={() => setIsNavOpen(false)}>MY ORDERS</Link>
+          <Link href="/loyalty" className={activePage === 'loyalty' ? 'active' : ''} onClick={() => setIsNavOpen(false)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, color: 'var(--deep-green)' }}>
+            <span>👑</span>
+            <span>VIP CLUB</span>
+          </Link>
 
           {isAdmin && (
             <Link
@@ -134,27 +136,34 @@ export default function SiteNav({ activePage = 'home' }) {
                 >
                   <div style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '12px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '10px' }}>
                     Logged in as<br />
-                    <strong style={{ color: '#ffffff', fontSize: '0.92rem' }}>{user.email}</strong>
+                    <strong style={{ color: 'var(--ink, #1F2937)', fontSize: '0.92rem' }}>{user.email}</strong>
                   </div>
                   <Link
                     href="/my-orders"
                     onClick={() => setUserMenuOpen(false)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '700', color: 'var(--ink, #1F2937)', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
                   >
                     📦 My Orders
                   </Link>
                   <Link
                     href="/profile"
                     onClick={() => setUserMenuOpen(false)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '700', color: '#ffffff', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '700', color: 'var(--ink, #1F2937)', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
                   >
                     👤 My Profile
+                  </Link>
+                  <Link
+                    href="/loyalty"
+                    onClick={() => setUserMenuOpen(false)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '800', color: '#B45309', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
+                  >
+                    👑 VIP Club &amp; Points
                   </Link>
                   {isAdmin && (
                     <Link
                       href="/admin"
                       onClick={() => setUserMenuOpen(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '800', color: 'var(--deep-green)', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', fontSize: '0.95rem', fontWeight: '800', color: 'var(--deep-green, #CB202D)', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.04)' }}
                     >
                       🛡️ Admin Portal
                     </Link>

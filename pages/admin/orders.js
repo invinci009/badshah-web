@@ -132,14 +132,15 @@ export default function AdminOrdersDesk() {
   const handleUpdateStatus = async (orderId, newStatus) => {
     const targetOrd = orders.find(o => o.id === orderId || o.orderId === orderId)
     const paySt = (targetOrd?.paymentStatus || '').toLowerCase()
-    const ordSt = (targetOrd?.orderStatus || targetOrd?.status || '').toLowerCase()
+    const method = (targetOrd?.paymentMethod || '').toUpperCase()
+    const isCod = method === 'COD' || method.includes('CASH')
     const isPaid = paySt === 'paid' || paySt === 'verified' || ordSt === 'payment_verified'
       || ordSt === 'accepted' || ordSt === 'preparing' || ordSt === 'ready' || ordSt === 'out for delivery'
+      || isCod
 
-    // ── PAYMENT-FIRST RULE: staff cannot accept/advance an order until the
-    // admin has verified & approved the UPI payment. Cancel stays allowed.
-    if (newStatus !== 'Cancelled' && !isPaid) {
-      triggerFeedback('⚠️ Admin must verify & approve the UPI payment before this order can be accepted or advanced.')
+    // ── PAYMENT GATE: Cash on delivery orders can be accepted and advanced immediately
+    if (newStatus !== 'Cancelled' && !isPaid && !isCod) {
+      triggerFeedback('⚠️ Payment must be verified before this order can be accepted or advanced.')
       return
     }
 
@@ -190,7 +191,7 @@ export default function AdminOrdersDesk() {
 
     try {
       const targetDoc = doc(db, 'orders', orderId)
-      const updateData = { orderStatus: newStatus, updatedAt: serverTimestamp() }
+      const updateData = { orderStatus: newStatus, status: newStatus, updatedAt: serverTimestamp() }
       if (newPaymentStatus) updateData.paymentStatus = newPaymentStatus
       await updateDoc(targetDoc, updateData)
 
@@ -206,6 +207,29 @@ export default function AdminOrdersDesk() {
       triggerFeedback(`Order status updated to ${newStatus}`)
     } catch (e) {
       triggerFeedback(`Status update error: ${e.message}`)
+    }
+  }
+
+  const handleMarkCodPaid = async (orderId) => {
+    try {
+      const targetDoc = doc(db, 'orders', orderId)
+      await updateDoc(targetDoc, {
+        paymentStatus: 'paid',
+        updatedAt: serverTimestamp()
+      })
+
+      fetch('/api/orders/update-status', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ orderId, paymentStatus: 'paid' })
+      }).catch(() => {})
+
+      triggerFeedback(`💵 Cash payment collected! Marked as Paid.`)
+    } catch (e) {
+      triggerFeedback(`Error updating payment: ${e.message}`)
     }
   }
 
@@ -754,6 +778,41 @@ export default function AdminOrdersDesk() {
                             </div>
                           )
                         })}
+
+                        {ord.appliedReward && (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '8px 12px',
+                            background: '#EFFDF5',
+                            border: '1.5px dashed #22c55e',
+                            borderRadius: '10px',
+                            marginTop: '8px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontSize: '1.15rem' }}>🎁</span>
+                              <div>
+                                <span style={{ fontSize: '0.72rem', fontWeight: 900, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
+                                  TOP-UP COMPLIMENTARY DELICACY
+                                </span>
+                                <span style={{ fontSize: '0.86rem', fontWeight: 900, color: '#15803d' }}>
+                                  {ord.appliedReward.name}
+                                </span>
+                              </div>
+                            </div>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 900,
+                              background: '#16a34a',
+                              color: '#ffffff',
+                              padding: '3px 8px',
+                              borderRadius: '6px'
+                            }}>
+                              PACK FREE
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* GRAND TOTAL HIGHLIGHT */}
@@ -845,34 +904,67 @@ export default function AdminOrdersDesk() {
 
                       {/* Payment Card */}
                       {(() => {
+                        const isCod = (ord.paymentMethod || '').toUpperCase() === 'COD' || (ord.paymentMethod || '').toLowerCase().includes('cash')
                         const isPaymentPaid = ord.paymentStatus === 'paid' || ord.paymentStatus === 'Paid' || Boolean(ord.razorpayPaymentId) || ord.paymentVerifiedBy === 'CLIENT_VERIFY'
                         return (
                           <div style={{
-                            background: isPaymentPaid ? '#EFF3E6' : (ord.paymentStatus === 'refunded' || ord.paymentStatus === 'Refunded' || isRefunded) ? '#fff7ed' : isCancelled ? '#fce8e6' : '#fef3c7',
+                            background: isPaymentPaid ? '#EFF3E6' : (ord.paymentStatus === 'refunded' || ord.paymentStatus === 'Refunded' || isRefunded) ? '#fff7ed' : isCancelled ? '#fce8e6' : '#fffbeb',
                             borderRadius: '12px',
                             padding: '10px 12px',
                             display: 'flex',
                             flexDirection: 'column',
-                            justify: 'space-between',
-                            border: '1px solid rgba(0,0,0,0.05)'
+                            justifyContent: 'space-between',
+                            border: isPaymentPaid ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(245, 158, 11, 0.2)'
                           }}>
                             <div>
                               <div style={{ fontSize: '0.76rem', fontWeight: 900, color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                💳 {ord.paymentMethod === 'RAZORPAY' || ord.isRazorpay || ord.razorpayPaymentId ? 'Razorpay Online' : (ord.paymentMethod === 'UPI' ? 'UPI Online' : 'Cash on Delivery')}
+                                {isCod ? '💵 Cash on Delivery' : '💳 Online Payment'}
                               </div>
 
-                              <div style={{ fontSize: '0.76rem', fontWeight: 900, marginTop: '2px', color: isPaymentPaid ? '#CB202D' : (ord.paymentStatus === 'refunded' || ord.paymentStatus === 'Refunded' || isRefunded) ? '#d97706' : isCancelled ? '#dc2626' : '#b45309' }}>
-                                {isPaymentPaid ? '🟢 Paid' : (ord.paymentStatus === 'refunded' || ord.paymentStatus === 'Refunded' || isRefunded) ? '💸 Refunded' : isCancelled ? '🔴 Rejected' : '🟡 Verification Pending'}
+                              <div style={{ fontSize: '0.76rem', fontWeight: 900, marginTop: '2px', color: isPaymentPaid ? '#15803d' : (ord.paymentStatus === 'refunded' || ord.paymentStatus === 'Refunded' || isRefunded) ? '#d97706' : isCancelled ? '#dc2626' : '#b45309' }}>
+                                {isPaymentPaid ? '🟢 Paid / Collected' : (ord.paymentStatus === 'refunded' || ord.paymentStatus === 'Refunded' || isRefunded) ? '💸 Refunded' : isCancelled ? '🔴 Cancelled' : isCod ? '🟡 Pay on Delivery' : '🟡 Verification Pending'}
                               </div>
 
-                              {ord.transactionReference && (
+                              {isCod && !isPaymentPaid && !isCancelled && (
+                                <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#92400e', marginTop: '2px' }}>
+                                  Collect ₹{(ord.grandTotal || 0).toFixed(0)} at doorstep
+                                </div>
+                              )}
+
+                              {!isCod && ord.transactionReference && (
                                 <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--ink)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   Ref: {ord.transactionReference}
                                 </div>
                               )}
                             </div>
 
-                            {!isLocked && !isPaymentPaid && (ord.paymentStatus === 'verification_pending' || ord.paymentStatus === 'Verification Pending' || ord.orderStatus === 'payment_verification_pending') && (
+                            {/* COD 1-click cash collected action */}
+                            {!isLocked && !isPaymentPaid && !isCancelled && isCod && (
+                              <button
+                                type="button"
+                                onClick={() => handleMarkCodPaid(ord.id)}
+                                style={{
+                                  marginTop: '8px',
+                                  background: 'var(--deep-green, #15803d)',
+                                  color: '#ffffff',
+                                  border: 'none',
+                                  padding: '5px 8px',
+                                  borderRadius: '6px',
+                                  fontWeight: 800,
+                                  fontSize: '0.7rem',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                Collect Cash 💵
+                              </button>
+                            )}
+
+                            {/* Legacy UPI verify buttons */}
+                            {!isLocked && !isPaymentPaid && !isCod && (ord.paymentStatus === 'verification_pending' || ord.paymentStatus === 'Verification Pending' || ord.orderStatus === 'payment_verification_pending') && (
                               <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
                                 <button
                                   type="button"

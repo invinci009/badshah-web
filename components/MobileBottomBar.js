@@ -30,6 +30,10 @@ export default function MobileBottomBar({ activeTab = 'home', cartCount = 0, onO
           <span className="tab-icon">📦</span>
           Orders
         </Link>
+        <Link href="/loyalty" className={activeTab === 'loyalty' ? 'active' : ''}>
+          <span className="tab-icon">👑</span>
+          VIP Club
+        </Link>
         {user && isAdmin && (
           <Link href="/admin" className={activeTab === 'admin' ? 'active' : ''} style={{ color: 'var(--deep-green)', fontWeight: 800 }}>
             <span className="tab-icon">🛡️</span>

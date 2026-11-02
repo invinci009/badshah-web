@@ -22,7 +22,7 @@ biryani/
 │   ├── AnnouncementBanner.js   # Real-time Global Announcement Banner with dynamic themes & XSS safety
 │   ├── AuthModal.js            # Pop-up login/signup dialog with Google OAuth & Email auth
 │   ├── CheckoutModal.js        # Multi-step checkout funnel with dynamic fee math & store checks
-│   └── UpiPaymentBox.js        # Interactive QR code generator & UTR verification box
+│   └── UpiPaymentBox.js        # Cash on Delivery (COD) payment card
 ├── context/              # React Context Providers for global state management
 │   ├── AuthContext.js          # Global user session, admin privileges, & auth handlers
 │   └── SettingsContext.js      # Real-time Firestore store settings & live announcements
@@ -112,10 +112,8 @@ biryani/
 - `handleStep1Submit(e)`: Validates name, phone number, and delivery address inputs. Verifies `settings.isStoreOpen` before advancing to Step 2.
 - `handleFinalOrderSubmit(e)`: Submits finalized order data to `/api/orders/create`. Verifies live store status before execution.
 
-#### `components/UpiPaymentBox.js`
-- `UpiPaymentBox({ grandTotal, storeUpiId, onPaymentComplete, onCancel })`: Interactive payment interface that generates dynamic UPI QR codes (`upi://pay?pa=...&am=...`), handles 1-click UPI app opening (GPay, PhonePe, Paytm), and captures user UTR/Transaction reference IDs.
-- `generateUpiUrl()`: Constructs a standardized `upi://pay` URI string with encoded payee details and precise transaction amount.
-- `handleVerifyAndPay()`: Validates that the user has entered a valid 12-digit UTR transaction number before marking payment as pending verification.
+#### `components/UpiPaymentBox.js` (Cash on Delivery Box)
+- `CodPaymentBox({ grandTotal, onConfirmPayment })`: Dedicated Cash on Delivery interface with zero upfront payment friction, exact cash reminders, and doorstep assurance guarantees.
 
 ---
 

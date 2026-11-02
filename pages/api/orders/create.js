@@ -128,12 +128,38 @@ async function handler(req, res) {
       console.warn('Backend store status check notice:', e.message)
     }
 
+    // ── Generate Order ID ───────────────────────────────────────────────────
+    const orderId = req.body.orderId || `BB-PATNA-${Math.floor(100000 + Math.random() * 900000)}`
+
+    // ── Server-side Loyalty Reward Redemption ──────────────────────────────
+    let verifiedLoyaltyDiscount = 0
+    let createdRedemptionId = null
+    const rewardPayload = req.body.appliedReward || (req.body.loyaltyRewardId ? { id: req.body.loyaltyRewardId } : null)
+
+    if (rewardPayload && rewardPayload.id) {
+      try {
+        const { applyRewardRedemption, normalizePhone } = await import('../../../lib/loyalty')
+        const custId = normalizePhone(finalPhone) || userId || userEmail
+        const redResult = await applyRewardRedemption({
+          customerId: custId,
+          rewardId: rewardPayload.id,
+          subtotal: rawSubtotal,
+          orderId,
+        })
+        verifiedLoyaltyDiscount = redResult.discountAmount || 0
+        createdRedemptionId = redResult.redemptionId
+      } catch (rErr) {
+        console.warn('Loyalty reward apply error at order creation:', rErr.message)
+      }
+    }
+
+    const totalDiscountCombined = verifiedDiscount + verifiedLoyaltyDiscount
+
     // ── Compute verified totals ──────────────────────────────────────────────
-    const orderId           = req.body.orderId || `BB-PATNA-${Math.floor(100000 + Math.random() * 900000)}`
     const calculatedSubtotal = rawSubtotal
     const calculatedDelivery = Number(req.body.deliveryCharge) || 0
     const calculatedTax      = Number(req.body.tax) || 0
-    const verifiedGrandTotal = Math.max(0, calculatedSubtotal + calculatedDelivery + calculatedTax - verifiedDiscount)
+    const verifiedGrandTotal = Math.max(0, calculatedSubtotal + calculatedDelivery + calculatedTax - totalDiscountCombined)
 
     const orderDoc = {
       orderId,
@@ -149,22 +175,34 @@ async function handler(req, res) {
       subtotal:          calculatedSubtotal,
       deliveryCharge:    calculatedDelivery,
       tax:               calculatedTax,
-      discount:          verifiedDiscount,
+      discount:          totalDiscountCombined,
+      couponDiscount:    verifiedDiscount,
+      loyaltyDiscount:   verifiedLoyaltyDiscount,
       appliedCoupon:     couponCodeToApply,
+      appliedReward:     rewardPayload ? {
+        id: rewardPayload.id,
+        name: rewardPayload.name,
+        type: rewardPayload.type || 'FREE_ITEM',
+        pointsCost: Number(rewardPayload.pointsCost) || 0,
+        discount: verifiedLoyaltyDiscount,
+      } : null,
+      loyaltyRedemptionId: createdRedemptionId,
       grandTotal:        verifiedGrandTotal,
-      paymentMethod:     req.body.paymentMethod  || 'UPI',
-      paymentStatus:     req.body.paymentStatus  || 'verification_pending',
-      orderStatus:       req.body.orderStatus    || 'payment_verification_pending',
-      customerMarkedPaid: req.body.customerMarkedPaid ?? true,
+      paymentMethod:     req.body.paymentMethod  || 'COD',
+      paymentStatus:     req.body.paymentStatus  || 'pending',
+      orderStatus:       req.body.orderStatus    || 'pending',
+      customerMarkedPaid: req.body.customerMarkedPaid ?? false,
       transactionReference: req.body.transactionReference || null,
-      status:            req.body.orderStatus    || 'payment_verification_pending',
+      status:            req.body.orderStatus    || 'pending',
     }
 
     // ── Pure Firestore: Persist order securely with server-verified totals ───
     const now = new Date().toISOString()
     const finalOrderRecord = {
       ...orderDoc,
-      discount:   verifiedDiscount,
+      discount:   totalDiscountCombined,
+      couponDiscount: verifiedDiscount,
+      loyaltyDiscount: verifiedLoyaltyDiscount,
       grandTotal: verifiedGrandTotal,
       createdAt:  now,
       updatedAt:  now,
@@ -175,6 +213,12 @@ async function handler(req, res) {
       await patchFirestoreDoc('orders', orderId, finalOrderRecord)
     } catch (e) {
       console.error('Error writing order to Firestore (REST):', e.message)
+      // Rollback loyalty points if order failed to persist
+      if (createdRedemptionId) {
+        import('../../../lib/loyalty')
+          .then(m => m.cancelRedemption(createdRedemptionId, 'Order persistence failure rollback'))
+          .catch(() => {})
+      }
       throw new Error('Failed to persist order to database: ' + e.message)
     }
 

@@ -14,6 +14,9 @@ export default function ProfilePage() {
   const [message, setMessage] = useState('')
   const [isNavOpen, setIsNavOpen] = useState(false)
 
+  const [loyaltyPoints, setLoyaltyPoints] = useState(null)
+  const [loyaltyTier, setLoyaltyTier] = useState('Royal Bronze')
+
   useEffect(() => {
     if (userProfile) {
       setName(userProfile.name || user?.displayName || '')
@@ -21,6 +24,21 @@ export default function ProfilePage() {
       setAddress(userProfile.defaultAddress || '')
     }
   }, [userProfile, user])
+
+  useEffect(() => {
+    if (user?.uid || userProfile?.phone) {
+      const p = userProfile?.phone || ''
+      fetch(`/api/loyalty/summary?customerId=${encodeURIComponent(user?.uid || '')}${p ? `&phone=${encodeURIComponent(p)}` : ''}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d?.snapshot) {
+            setLoyaltyPoints(d.snapshot.availablePoints ?? 0)
+            if (d.customer?.tier) setLoyaltyTier(d.customer.tier)
+          }
+        })
+        .catch(() => {})
+    }
+  }, [user, userProfile])
 
   if (!user) {
     return (
@@ -95,6 +113,59 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* Badshah VIP Club Royal Card Widget */}
+            <div
+              style={{
+                borderRadius: '20px',
+                padding: '20px',
+                background: 'linear-gradient(135deg, #7A0210 0%, #9E0C1F 60%, #4A000A 100%)',
+                color: '#FFFFFF',
+                border: '1.5px solid rgba(245, 197, 24, 0.45)',
+                boxShadow: '0 8px 24px rgba(122, 2, 16, 0.2)',
+                marginBottom: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '14px',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '1rem' }}>👑</span>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: '0.1em', color: '#FDE047', textTransform: 'uppercase' }}>
+                    BADSHAH ONLINE VIP • {loyaltyTier}
+                  </span>
+                </div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#FDE047' }}>
+                  {loyaltyPoints !== null ? `${loyaltyPoints} Available Points` : 'Loading Points...'}
+                </div>
+                <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', color: '#FCE7F3', opacity: 0.9 }}>
+                  Earn +20 points on every web delivery feast. Unlock free dishes &amp; discounts.
+                </p>
+              </div>
+
+              <Link
+                href="/loyalty"
+                style={{
+                  background: '#FDE047',
+                  color: '#7A0210',
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  fontWeight: 900,
+                  fontSize: '0.78rem',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                }}
+              >
+                <span>View Rewards Portal</span>
+                <span>→</span>
+              </Link>
             </div>
 
             {/* Quick Actions Grid */}

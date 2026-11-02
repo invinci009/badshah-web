@@ -11,9 +11,9 @@ export const getStatusMeta = (status, isDelivered, isCancelled) => {
   switch (normStatus) {
     case 'upi verification pending':
     case 'payment_verification_pending':
-      return { color: '#b45309', bg: '#fef3c7', text: 'UPI VERIFICATION REQUIRED', icon: '💳' }
+      return { color: '#b45309', bg: '#fef3c7', text: 'VERIFICATION PENDING', icon: '⏳' }
     case 'pending':
-      return { color: '#d97706', bg: '#fef3c7', text: 'PENDING CONFIRMATION', icon: '⏳' }
+      return { color: '#b45309', bg: '#fef3c7', text: 'ORDER PLACED (COD)', icon: '💵' }
     case 'accepted':
     case 'payment_verified':
     case 'payment verified':

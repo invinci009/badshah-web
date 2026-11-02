@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import UpiPaymentBox from './UpiPaymentBox'
 import { getDocs, query, collection, where } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useSettings } from '../context/SettingsContext'
+import { useAuth } from '../context/AuthContext'
 import AnnouncementBanner from './AnnouncementBanner'
 
 export default function CheckoutModal({
@@ -19,11 +19,12 @@ export default function CheckoutModal({
   coLoading = false
 }) {
   const { settings } = useSettings()
-  const [step, setStep] = useState(1) // 1: Delivery Details, 2: Payment & Review
+  const { accessToken } = useAuth() || {}
+  const [step, setStep] = useState(1) // 1: Delivery Details, 2: Cash On Delivery Review
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('UPI') // All payments via UPI QR code
+  const [paymentMethod, setPaymentMethod] = useState('COD') // Cash on Delivery exclusively
   const [showItemSummary, setShowItemSummary] = useState(false)
 
   // Coupon State
@@ -31,6 +32,31 @@ export default function CheckoutModal({
   const [appliedCoupon, setAppliedCoupon] = useState(null)
   const [couponError, setCouponError] = useState('')
   const [couponLoading, setCouponLoading] = useState(false)
+
+  // VIP Loyalty Rewards State
+  const [rewardsList, setRewardsList] = useState([])
+  const [customerPoints, setCustomerPoints] = useState(0)
+  const [appliedReward, setAppliedReward] = useState(null)
+  const [rewardError, setRewardError] = useState('')
+
+  // Fetch available loyalty perks for current user / phone
+  useEffect(() => {
+    if (!isOpen) return
+    const activePhone = phone ? phone.replace(/\D/g, '').replace(/^91/, '').slice(-10) : (userProfile?.phone || '')
+    const activeCid = activePhone || user?.uid || user?.email || ''
+    const url = `/api/loyalty/rewards?subtotal=${cartTotal}${activePhone ? `&phone=${encodeURIComponent(activePhone)}` : ''}${activeCid ? `&customerId=${encodeURIComponent(activeCid)}` : ''}`
+    const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+    fetch(url, { headers })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d) {
+          if (Array.isArray(d.rewards)) setRewardsList(d.rewards)
+          if (d.customerPoints !== undefined) setCustomerPoints(d.customerPoints)
+        }
+      })
+      .catch(() => {})
+  }, [isOpen, phone, userProfile, user, accessToken, cartTotal])
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return
@@ -230,9 +256,10 @@ export default function CheckoutModal({
       : Math.min(cartTotal, Number(appliedCoupon.discountValue) || 0)
   ) : 0
 
-  const finalTotal = Math.max(0, grandTotal - discountAmount)
+  const loyaltyDiscountAmount = appliedReward ? (Number(appliedReward.discount) || 0) : 0
+  const finalTotal = Math.max(0, grandTotal - discountAmount - loyaltyDiscountAmount)
 
-  const handleFinalOrderSubmit = (e, utr = null) => {
+  const handleFinalOrderSubmit = (e) => {
     if (e) e.preventDefault()
     if (settings?.isStoreOpen === false) {
       alert('🔴 Restaurant is currently closed. We are not accepting online orders right now.')
@@ -256,10 +283,16 @@ export default function CheckoutModal({
       name: name.trim(),
       phone: cleanPhone,
       address: address.trim(),
-      paymentMethod,
-      isUpi: paymentMethod === 'UPI',
-      coupon: appliedCoupon ? { code: appliedCoupon.couponCode, discount: discountAmount } : null
-    }, utr)
+      paymentMethod: 'COD',
+      isUpi: false,
+      coupon: appliedCoupon ? { code: appliedCoupon.couponCode, discount: discountAmount } : null,
+      appliedReward: appliedReward ? {
+        id: appliedReward.id,
+        name: appliedReward.name,
+        discount: loyaltyDiscountAmount,
+        pointsCost: appliedReward.pointsCost,
+      } : null,
+    })
   }
 
   const handleQuickAddress = (landmark) => {
@@ -309,7 +342,7 @@ export default function CheckoutModal({
             }}
           >
             <span className="step-number">2</span>
-            <span className="step-name">Payment & Confirm</span>
+            <span className="step-name">Cash on Delivery</span>
           </button>
         </div>
 
@@ -381,6 +414,152 @@ export default function CheckoutModal({
                   {couponError && <p className="coupon-err-msg">⚠️ {couponError}</p>}
                 </div>
 
+                {/* 👑 VIP CLUB POINTS & TOP-UP STATION */}
+                <div className="chk-loyalty-container">
+                  {/* Top Status Strip */}
+                  <div className="chk-loyalty-header">
+                    <div className="chk-loyalty-title-wrap">
+                      <span className="chk-loyalty-crown">👑</span>
+                      <div>
+                        <span className="chk-loyalty-heading">BADSHAH VIP CLUB</span>
+                        <div className="chk-loyalty-subheading">
+                          Top up complimentary delicacies with points
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="chk-loyalty-pts-pill">
+                      <span className="chk-loyalty-pts-num">{customerPoints}</span>
+                      <span className="chk-loyalty-pts-lbl">POINTS</span>
+                    </div>
+                  </div>
+
+                  {/* Earning banner */}
+                  <div className="chk-loyalty-earn-notice">
+                    <span>✨</span>
+                    <span><strong>+20 VIP Points</strong> will be credited on delivery of this feast</span>
+                  </div>
+
+                  {/* ACTIVE TOPPED-UP REWARD CARD */}
+                  {appliedReward ? (
+                    <div className="chk-applied-topup-card">
+                      <div className="chk-applied-topup-left">
+                        <span className="chk-applied-topup-badge">✓ TOPPED UP INTO ORDER</span>
+                        <h4 className="chk-applied-topup-name">{appliedReward.name}</h4>
+                        <p className="chk-applied-topup-detail">
+                          {appliedReward.type === 'FREE_ITEM' ? 'Complimentary Delicacy (₹0)' : `Privilege Discount (-₹${loyaltyDiscountAmount})`}
+                          {' • '}Used {appliedReward.pointsCost} points
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAppliedReward(null)}
+                        className="chk-applied-topup-remove"
+                      >
+                        ✕ Remove
+                      </button>
+                    </div>
+                  ) : (
+                    /* AVAILABLE TOP-UPS TRAY */
+                    <div className="chk-topups-tray">
+                      <div className="chk-topups-tray-header">
+                        <span className="chk-topups-tray-title">AVAILABLE TOP-UP DELICACIES</span>
+                        <span className="chk-topups-tray-count">{rewardsList.length} Options</span>
+                      </div>
+
+                      {rewardsList.length > 0 ? (
+                        <div className="chk-topup-cards-grid">
+                          {rewardsList.map((r) => {
+                            const canAfford = customerPoints >= r.pointsCost
+                            const meetsMinOrder = cartTotal >= (r.minOrder || 0)
+                            const isEligible = canAfford && meetsMinOrder
+                            const ptsNeeded = Math.max(0, r.pointsCost - customerPoints)
+                            const progressPct = Math.min(100, Math.round((customerPoints / r.pointsCost) * 100))
+
+                            return (
+                              <div
+                                key={r.id}
+                                className={`chk-topup-item-card ${isEligible ? 'eligible' : 'locked'}`}
+                              >
+                                <div className="chk-topup-item-main">
+                                  <div className="chk-topup-item-icon">
+                                    {r.type === 'FREE_ITEM' ? '🍮' : '🏷️'}
+                                  </div>
+                                  <div className="chk-topup-item-info">
+                                    <div className="chk-topup-item-tags">
+                                      <span className="chk-topup-tag type">
+                                        {r.type === 'FREE_ITEM' ? 'FREE DISH' : 'DISCOUNT'}
+                                      </span>
+                                      <span className="chk-topup-tag cost">
+                                        🪙 {r.pointsCost} PTS
+                                      </span>
+                                    </div>
+                                    <h5 className="chk-topup-item-name">{r.name}</h5>
+                                    <p className="chk-topup-item-desc">
+                                      {r.description || (r.type === 'FREE_ITEM' ? 'Free delicacy added to order' : `Save ₹${r.discountValue} on order`)}
+                                    </p>
+                                    {r.minOrder > 0 && (
+                                      <span className="chk-topup-min-order">
+                                        Min order ₹{r.minOrder}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Action / Status Bar */}
+                                <div className="chk-topup-action-bar">
+                                  {isEligible ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const calcDiscount = r.type === 'PERCENT_DISCOUNT'
+                                          ? Math.min(r.discountMax || 9999, Math.round((cartTotal * (r.discountValue || 0)) / 100))
+                                          : (r.discountValue || 0)
+                                        setAppliedReward({
+                                          ...r,
+                                          discount: Math.min(calcDiscount, cartTotal),
+                                        })
+                                        setRewardError('')
+                                      }}
+                                      className="chk-topup-btn-claim"
+                                    >
+                                      <span>+ TOP UP THIS DELICACY</span>
+                                      <span className="chk-topup-free-tag">FREE</span>
+                                    </button>
+                                  ) : !canAfford ? (
+                                    <div className="chk-topup-locked-box">
+                                      <div className="chk-topup-locked-label">
+                                        <span>🔒 Need {ptsNeeded} more pts</span>
+                                        <span>{customerPoints}/{r.pointsCost}</span>
+                                      </div>
+                                      <div className="chk-topup-progress-track">
+                                        <div
+                                          className="chk-topup-progress-fill"
+                                          style={{ width: `${progressPct}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="chk-topup-min-needed">
+                                      Add ₹{(r.minOrder - cartTotal).toFixed(0)} more items to qualify
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <div className="chk-topups-empty">
+                          No top-up perks configured at this time.
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {rewardError && <p className="chk-topup-err">⚠️ {rewardError}</p>}
+                </div>
+
                 {/* Bill Details Breakdown */}
                 <div className="chk-bill-details">
                   <div className="bill-row">
@@ -390,10 +569,39 @@ export default function CheckoutModal({
 
                   {appliedCoupon && (
                     <div className="bill-row discount">
-                      <span>Coupon Discount</span>
+                      <span>Coupon Discount ({appliedCoupon.couponCode})</span>
                       <span>-₹{discountAmount}</span>
                     </div>
                   )}
+
+                  {appliedReward && (
+                    <div className="bill-row discount" style={{ color: '#15803D' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>🎁</span>
+                        <span>{appliedReward.type === 'FREE_ITEM' ? `Complimentary ${appliedReward.name}` : `VIP Discount (${appliedReward.name})`}</span>
+                      </span>
+                      <span>
+                        {appliedReward.type === 'FREE_ITEM' ? (
+                          <>
+                            <span style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '6px' }}>
+                              ₹{loyaltyDiscountAmount}
+                            </span>
+                            <strong style={{ color: '#15803D' }}>FREE (₹0)</strong>
+                          </>
+                        ) : (
+                          `-₹${loyaltyDiscountAmount}`
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="bill-row" style={{ color: '#B45309', fontWeight: 800, fontSize: '0.74rem' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span>✨</span>
+                      <span>VIP Points To Earn On Delivery</span>
+                    </span>
+                    <span>+20 Points</span>
+                  </div>
 
                   <div className="bill-row">
                     <span>Delivery Charge</span>
@@ -513,11 +721,11 @@ export default function CheckoutModal({
                 </div>
 
                 <button type="submit" className="chk-action-btn primary">
-                  CONTINUE TO PAYMENT →
+                  CONTINUE TO CASH ON DELIVERY →
                 </button>
               </form>
             ) : (
-              /* STEP 2: PAYMENT METHOD & CONFIRMATION */
+              /* STEP 2: CASH ON DELIVERY & FINAL CONFIRMATION */
               <div className="chk-form-step">
                 <div className="step-intro">
                   <div className="step-top-row">
@@ -526,8 +734,8 @@ export default function CheckoutModal({
                       ← Edit Address
                     </button>
                   </div>
-                  <h3>Payment Method</h3>
-                  <p className="delivering-to-text">Delivering to: <strong>{address}</strong></p>
+                  <h3>Cash On Delivery (COD)</h3>
+                  <p className="delivering-to-text">Confirm your order & pay upon doorstep delivery</p>
                 </div>
 
                 {!user && (
@@ -539,13 +747,94 @@ export default function CheckoutModal({
                   </div>
                 )}
 
-                <UpiPaymentBox
-                  grandTotal={finalTotal}
-                  upiId={settings?.storeUpiId || 'electrohousejsr@okicici'}
-                  restaurantName="Biryani Badshah"
-                  loading={coLoading}
-                  onConfirmPayment={handleFinalOrderSubmit}
-                />
+                <div className="cod-box-wrapper">
+                  {/* Selected Payment Method Card */}
+                  <div className="cod-selection-card">
+                    <span className="cod-active-badge">
+                      <span>●</span> ACTIVE PAYMENT
+                    </span>
+                    <div className="cod-icon-wrap">
+                      💵
+                    </div>
+                    <div className="cod-meta-info">
+                      <h4 className="cod-meta-title">Cash on Delivery (COD)</h4>
+                      <p className="cod-meta-desc">Pay physical cash or scan the rider&apos;s UPI QR when your piping hot dum biryani arrives.</p>
+                    </div>
+                    <div className="cod-check-indicator">
+                      ✓
+                    </div>
+                  </div>
+
+                  {/* Delivery Location Preview */}
+                  <div className="cod-dest-card">
+                    <div className="cod-dest-text">
+                      <strong>📍 Delivering to {name} ({phone})</strong>
+                      <span>{address}</span>
+                    </div>
+                    <button type="button" onClick={() => setStep(1)} className="cod-edit-btn">
+                      Change
+                    </button>
+                  </div>
+
+                  {/* Topped-Up VIP Delicacy Confirmation */}
+                  {appliedReward && (
+                    <div style={{
+                      marginTop: '12px',
+                      padding: '12px 14px',
+                      background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+                      border: '1.5px solid #86EFAC',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      boxShadow: '0 2px 8px rgba(22, 163, 74, 0.08)'
+                    }}>
+                      <span style={{ fontSize: '1.4rem' }}>🎁</span>
+                      <div style={{ flex: 1, fontSize: '0.8rem', color: '#166534', lineHeight: 1.35 }}>
+                        <strong style={{ display: 'block', color: '#15803D', fontSize: '0.86rem' }}>
+                          ✓ Topped-Up: {appliedReward.name}
+                        </strong>
+                        <span>Packed complimentary with your feast! (Redeemed with {appliedReward.pointsCost} points)</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* COD Exact Amount Due Tip */}
+                  <div className="cod-change-tip">
+                    <span>💡</span>
+                    <div>
+                      <strong>Payable Amount: ₹{finalTotal.toFixed(0)}</strong>
+                      <div>Please keep exact cash ready or request the rider to present their UPI scanner on delivery.</div>
+                    </div>
+                  </div>
+
+                  {/* Assurance Grid */}
+                  <div className="cod-assurance-grid">
+                    <div className="cod-assurance-item">
+                      <span className="cod-assurance-icon">⚡</span>
+                      <span><strong>Instant Dispatch:</strong> Straight to kitchen — no payment verification delays!</span>
+                    </div>
+                    <div className="cod-assurance-item">
+                      <span className="cod-assurance-icon">🛡️</span>
+                      <span><strong>Zero Risk:</strong> Inspect your tamper-proof sealed pack before paying.</span>
+                    </div>
+                    <div className="cod-assurance-item">
+                      <span className="cod-assurance-icon">🍲</span>
+                      <span><strong>Authentic Dum Biryani:</strong> Handi-cooked and served piping hot with raita.</span>
+                    </div>
+                  </div>
+
+                  {/* Submit Order Action Button */}
+                  <button
+                    type="button"
+                    onClick={handleFinalOrderSubmit}
+                    disabled={coLoading || settings?.isStoreOpen === false}
+                    className="cod-submit-btn"
+                  >
+                    <span>{coLoading ? '⏳ PLACING YOUR COD ORDER...' : 'PLACE CASH ON DELIVERY ORDER ➔'}</span>
+                    <span className="cod-submit-price-badge">₹{finalTotal.toFixed(0)}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

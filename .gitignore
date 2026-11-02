@@ -8,3 +8,10 @@ node_modules/
 
 firebase-service-account*.json
 .firebase-service-account*
+
+# Local AI workspace & reference directories
+.opencode/
+.probe-messages.json
+reference/
+specs/
+

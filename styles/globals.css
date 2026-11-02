@@ -4320,37 +4320,16 @@ html, body {
   .find-us-section { padding-bottom: 0; }
   .find-us-hero { padding: 32px 20px 20px; }
   .find-us-headline { font-size: clamp(2.4rem, 13vw, 3.8rem) !important; line-height: 0.9; }
-  .find-us-cards { display: flex !important; flex-direction: column; gap: 0; border-top: none !important; padding: 16px 16px 0; }
-  .fuc-card { border-right: none !important; border-bottom: none !important; border-radius: 16px; margin-bottom: 12px; padding: 28px 24px !important; display: flex; flex-direction: column; gap: 0; }
-  .fuc-dine { background: var(--deep-green) !important; color: #fff; }
-  .fuc-dine .fuc-number { color: rgba(255,255,255,0.4) !important; }
-  .fuc-dine .fuc-title { color: #fff !important; font-size: 2.2rem !important; }
-  .fuc-dine .fuc-address { color: rgba(255,255,255,0.7) !important; }
-  .fuc-dine .fuc-hours { color: var(--yellow) !important; }
-  .fuc-dine .fuc-divider { background: rgba(255,255,255,0.2) !important; }
-  .fuc-dine .fuc-cta { background: var(--yellow) !important; color: var(--ink) !important; }
-  .fuc-delivery { background: var(--yellow) !important; color: var(--ink); }
-  .fuc-delivery .fuc-number { color: rgba(0,0,0,0.3) !important; }
-  .fuc-delivery .fuc-title { color: var(--ink) !important; font-size: 2.2rem !important; }
-  .fuc-delivery .fuc-address { color: rgba(0,0,0,0.6) !important; }
-  .fuc-delivery .fuc-hours { color: var(--ink) !important; font-weight: 800; }
-  .fuc-delivery .fuc-divider { background: rgba(0,0,0,0.15) !important; }
-  .fuc-delivery .fuc-cta { background: var(--ink) !important; color: #fff !important; }
+  .find-us-cards { display: flex !important; flex-direction: column; gap: 16px; border-top: none !important; padding: 16px 16px 0; }
+  .fuc-card { border-right: none !important; border-bottom: none !important; border-radius: 20px; padding: 28px 24px !important; display: flex; flex-direction: column; gap: 0; }
   .fuc-bg-text { display: none !important; }
   .find-us-note { padding: 16px 20px 32px; text-align: center; }
 }
 
-/* Remove black from Find Us mobile cards - use deep green instead */
 @media (max-width: 768px) {
-  .fuc-delivery { color: var(--deep-green) !important; }
-  .fuc-delivery .fuc-title { color: var(--deep-green) !important; }
-  .fuc-delivery .fuc-address { color: rgba(45,6,6,0.65) !important; }
-  .fuc-delivery .fuc-hours { color: var(--deep-green) !important; }
-  .fuc-delivery .fuc-number { color: rgba(45,6,6,0.35) !important; }
-  .fuc-delivery .fuc-cta { background: var(--deep-green) !important; color: #fff !important; }
-  .find-us-headline { color: var(--deep-green) !important; }
-  .find-us-headline em { color: var(--yellow) !important; }
-  .find-us-section .section-label { color: var(--deep-green) !important; }
+  .find-us-headline { color: #CB202D !important; }
+  .find-us-headline em { color: #CB202D !important; }
+  .find-us-section .section-label { color: #CB202D !important; }
 }
 
 /* Marquee mobile fix */
@@ -10547,8 +10526,7 @@ html, body {
 }
 
 /* Primary CTAs that had sand bg: red bg, white text */
-.btn-order, .fuc-cta, .fuc-delivery .fuc-cta, .fuc-dine .fuc-cta,
-.fuc-delivery, .hydro-btn, .hcs-bottom .btn {
+.btn-order, .hydro-btn, .hcs-bottom .btn {
   color: #ffffff !important;
 }
 .hydro-btn { background: #CB202D !important; }
@@ -10582,39 +10560,806 @@ html, body {
 .site-footer a { color: #D9D9D9 !important; }
 .site-footer a:hover, .footer-nav-list a:hover { color: #ffffff !important; border-bottom-color: #CB202D !important; }
 .site-footer p, .site-footer span, .site-footer small { color: #C9C9C9 !important; }
-/* ── FIND-US CARDS: MOBILE READABILITY FIX (final authority) ──
-   Cards are red on mobile; ALL text must be white, CTAs white pills with red text. */
-@media (max-width: 900px) {
-  .fuc-dine, .fuc-delivery {
-    background: #CB202D !important;
-    color: #ffffff !important;
+
+/* ── FIND-US SECTION: EXACT DESIGN MATCH FOR DINE IN & DELIVERY CARDS ── */
+.find-us-section {
+  background: #f7f5f0 !important;
+}
+
+.find-us-cards {
+  border-top: none !important;
+}
+
+@media (min-width: 769px) {
+  .find-us-cards {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 28px !important;
+    padding: 10px 6vw 60px !important;
   }
-  .fuc-title {
-    color: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+  .find-us-cards {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    padding: 10px 16px 24px !important;
   }
-  .fuc-address {
-    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.fuc-card {
+  position: relative !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  border: none !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+@media (min-width: 769px) {
+  .fuc-card {
+    padding: 48px 42px !important;
   }
-  .fuc-hours {
-    color: #ffffff !important;
-    opacity: 0.9 !important;
+}
+@media (max-width: 768px) {
+  .fuc-card {
+    padding: 28px 24px !important;
+    margin-bottom: 0 !important;
   }
-  .fuc-number,
-  .fuc-dine .fuc-number,
-  .fuc-delivery .fuc-number {
-    color: rgba(255, 255, 255, 0.55) !important;
-  }
-  .fuc-divider,
-  .fuc-dine .fuc-divider,
-  .fuc-delivery .fuc-divider {
-    background: rgba(255, 255, 255, 0.28) !important;
-  }
-  /* CTA pills: white bg + red text — pops on both cards */
-  .fuc-cta,
-  .fuc-dine .fuc-cta,
-  .fuc-delivery .fuc-cta {
-    background: #ffffff !important;
-    color: #CB202D !important;
-    font-weight: 800 !important;
-  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CARD 01: DINE IN (Solid Royal Mughal Red)
+   ───────────────────────────────────────────────────────────── */
+.fuc-card.fuc-dine,
+.fuc-dine {
+  background: #CB202D !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(203, 32, 45, 0.16) !important;
+  border: 1px solid rgba(203, 32, 45, 0.08) !important;
+}
+
+.fuc-dine .fuc-number {
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-family: 'Anton', sans-serif !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.fuc-dine .fuc-title {
+  color: #ffffff !important;
+  font-family: 'Anton', sans-serif !important;
+  font-size: clamp(2.3rem, 5vw, 3.6rem) !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 0 14px !important;
+  line-height: 1 !important;
+}
+
+.fuc-dine .fuc-divider {
+  width: 44px !important;
+  height: 2px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  margin-bottom: 20px !important;
+}
+
+.fuc-dine .fuc-address,
+.fuc-dine .fuc-address span {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-size: 0.98rem !important;
+  line-height: 1.55 !important;
+  margin: 0 0 16px !important;
+  font-weight: 450 !important;
+}
+
+.fuc-dine .fuc-hours {
+  color: #ffffff !important;
+  opacity: 0.95 !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  margin: 0 0 28px !important;
+}
+
+.fuc-dine .fuc-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #ffffff !important;
+  color: #CB202D !important;
+  font-family: inherit !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  text-decoration: none !important;
+  padding: 13px 26px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.fuc-dine .fuc-cta:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  background: #ffffff !important;
+  color: #CB202D !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CARD 02: DELIVERY (Soft Warm Cream with Red Accents)
+   ───────────────────────────────────────────────────────────── */
+.fuc-card.fuc-delivery,
+.fuc-delivery {
+  background: #FAF7F2 !important;
+  color: #2D0606 !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(45, 6, 6, 0.06) !important;
+}
+
+.fuc-delivery .fuc-number {
+  color: rgba(203, 32, 45, 0.22) !important;
+  font-family: 'Anton', sans-serif !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.fuc-delivery .fuc-title {
+  color: #CB202D !important;
+  font-family: 'Anton', sans-serif !important;
+  font-size: clamp(2.3rem, 5vw, 3.6rem) !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 0 14px !important;
+  line-height: 1 !important;
+}
+
+.fuc-delivery .fuc-divider {
+  width: 44px !important;
+  height: 2px !important;
+  background: rgba(203, 32, 45, 0.16) !important;
+  margin-bottom: 20px !important;
+}
+
+.fuc-delivery .fuc-address,
+.fuc-delivery .fuc-address span {
+  color: rgba(45, 6, 6, 0.72) !important;
+  font-size: 0.98rem !important;
+  line-height: 1.55 !important;
+  margin: 0 0 16px !important;
+  font-weight: 500 !important;
+}
+
+.fuc-delivery .fuc-hours {
+  color: #CB202D !important;
+  font-size: 0.88rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.2px !important;
+  margin: 0 0 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.fuc-delivery .fuc-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #ffffff !important;
+  color: #CB202D !important;
+  font-family: inherit !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  text-decoration: none !important;
+  padding: 13px 26px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(45, 6, 6, 0.08) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+
+.fuc-delivery .fuc-cta:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(203, 32, 45, 0.16) !important;
+  background: #FFFBFB !important;
+  color: #BA1B26 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CASH ON DELIVERY (COD) LUXURY CHECKOUT STYLES
+   ═══════════════════════════════════════════════════════════════ */
+.cod-box-wrapper {
+  background: #ffffff;
+  border: 1px solid rgba(203, 32, 45, 0.12);
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.cod-selection-card {
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #FFFDF2 100%);
+  border: 2px solid #16a34a;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cod-selection-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.18);
+}
+
+.cod-active-badge {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cod-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #f0fdf4;
+  border: 1.5px solid rgba(22, 163, 74, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+.cod-meta-info {
+  flex: 1;
+}
+
+.cod-meta-title {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cod-meta-desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.cod-check-indicator {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* COD Assurance Pillars */
+.cod-assurance-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cod-assurance-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.cod-assurance-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.cod-assurance-item strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* COD Exact Change Tip Box */
+.cod-change-tip {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: #92400e;
+  line-height: 1.4;
+}
+
+.cod-change-tip span {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Delivery destination card preview */
+.cod-dest-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #FFFDF2;
+  border: 1px solid rgba(203, 32, 45, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cod-dest-text {
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.cod-dest-text strong {
+  color: #0f172a;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.cod-edit-btn {
+  background: transparent;
+  border: none;
+  color: #CB202D;
+  font-weight: 800;
+  font-size: 0.76rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+
+.cod-edit-btn:hover {
+  background: rgba(203, 32, 45, 0.08);
+}
+
+/* CTA Button */
+.cod-submit-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 0.96rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(21, 128, 61, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.cod-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(21, 128, 61, 0.38);
+  filter: brightness(1.05);
+}
+
+.cod-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cod-submit-price-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHECKOUT VIP CLUB LOYALTY & TOP-UP STATION STYLES
+   ═══════════════════════════════════════════════════════════════ */
+.chk-loyalty-container {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(122, 2, 16, 0.04) 0%, rgba(245, 197, 24, 0.08) 100%);
+  border: 1.5px solid rgba(245, 197, 24, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.chk-loyalty-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chk-loyalty-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chk-loyalty-crown {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.chk-loyalty-heading {
+  font-size: 0.84rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--deep-green, #CB202D);
+  text-transform: uppercase;
+  display: block;
+}
+
+.chk-loyalty-subheading {
+  font-size: 0.72rem;
+  color: var(--muted, #64748b);
+  font-weight: 600;
+}
+
+.chk-loyalty-pts-pill {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  background: #1e293b;
+  color: #FDE047;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 197, 24, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.chk-loyalty-pts-num {
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #FDE047;
+}
+
+.chk-loyalty-pts-lbl {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.chk-loyalty-earn-notice {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #15803D;
+  font-weight: 600;
+}
+
+/* Active Topped-Up Card */
+.chk-applied-topup-card {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 2px solid #16a34a;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.12);
+}
+
+.chk-applied-topup-left {
+  flex: 1;
+}
+
+.chk-applied-topup-badge {
+  display: inline-block;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+.chk-applied-topup-name {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.chk-applied-topup-detail {
+  margin: 2px 0 0 0;
+  font-size: 0.74rem;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.chk-applied-topup-remove {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.chk-applied-topup-remove:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Available Top-Ups Tray */
+.chk-topups-tray {
+  margin-top: 14px;
+}
+
+.chk-topups-tray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.chk-topups-tray-title {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #713f12;
+  text-transform: uppercase;
+}
+
+.chk-topups-tray-count {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--muted, #64748b);
+}
+
+.chk-topup-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chk-topup-item-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chk-topup-item-card.eligible {
+  border: 1.5px solid rgba(22, 163, 74, 0.35);
+  background: linear-gradient(135deg, #ffffff 0%, #F0FDF4 100%);
+}
+
+.chk-topup-item-card.eligible:hover {
+  border-color: #16a34a;
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.12);
+}
+
+.chk-topup-item-card.locked {
+  opacity: 0.92;
+  background: #FAFAF9;
+}
+
+.chk-topup-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.chk-topup-item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #FFFBEB;
+  border: 1px solid #FEF3C7;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.chk-topup-item-info {
+  flex: 1;
+}
+
+.chk-topup-item-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.chk-topup-tag {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.chk-topup-tag.type {
+  background: rgba(203, 32, 45, 0.08);
+  color: var(--deep-green, #CB202D);
+}
+
+.chk-topup-tag.cost {
+  background: #FFFBEB;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.chk-topup-item-name {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.chk-topup-item-desc {
+  margin: 2px 0 0 0;
+  font-size: 0.72rem;
+  color: var(--muted, #64748b);
+  line-height: 1.35;
+}
+
+.chk-topup-min-order {
+  display: inline-block;
+  font-size: 0.66rem;
+  color: #92400e;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* Action Bar */
+.chk-topup-action-bar {
+  margin-top: 2px;
+}
+
+.chk-topup-btn-claim {
+  width: 100%;
+  padding: 9px 14px;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.chk-topup-btn-claim:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.chk-topup-free-tag {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.chk-topup-locked-box {
+  background: #F5F5F4;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.chk-topup-locked-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #78716c;
+  margin-bottom: 4px;
+}
+
+.chk-topup-progress-track {
+  height: 5px;
+  background: #e7e5e4;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.chk-topup-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #16A34A);
+  border-radius: 999px;
+}
+
+.chk-topup-min-needed {
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #b45309;
+  background: #FFFBEB;
+  padding: 6px 10px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px dashed #FDE68A;
+}
+
+.chk-topup-err {
+  margin: 8px 0 0 0;
+  color: #DC2626;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.chk-topups-empty {
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted, #64748b);
+  font-weight: 600;
 }

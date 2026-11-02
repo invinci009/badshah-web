@@ -66,5 +66,26 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Website VIP Club (Dedicated Loyalty Engine for badshah-web)
+    match /web_loyalty_accounts/{customerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /web_loyalty_transactions/{txId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /web_rewards/{rewardId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /web_redemptions/{redemptionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
