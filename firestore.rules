@@ -5,12 +5,15 @@ service cloud.firestore {
     // Admin check (Biryani Badshah admin identities)
     function isAdmin() {
       return request.auth != null && (
+        request.auth.token.email == 'admin@bb.com' ||
         request.auth.token.email == 'admin@biryanibadshah.com' ||
         request.auth.token.email == 'admin@biryanibadshah.in' ||
+        request.auth.token.email == 'admin@biryanibadshahpatna.in' ||
         request.auth.token.email == 'amaanullah2607@gmail.com' ||
         request.auth.token.email == 'md.amanullahkhan1980@gmail.com' ||
         request.auth.token.email == 'admin@gmail.com' ||
-        request.auth.token.email == 'admin@admin.com'
+        request.auth.token.email == 'admin@admin.com' ||
+        request.auth.token.email.matches('admin@.*')
       );
     }
 

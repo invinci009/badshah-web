@@ -47,6 +47,11 @@ export default function AdminSettingsDesk() {
   const [testTelegramming, setTestTelegramming] = useState(false)
   const [notifMessage, setNotifMessage] = useState('')
 
+  // Telegram Alert Settings
+  const [telegramBotToken, setTelegramBotToken] = useState('')
+  const [telegramChatId, setTelegramChatId] = useState('')
+  const [showBotToken, setShowBotToken] = useState(false)
+
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -196,11 +201,15 @@ export default function AdminSettingsDesk() {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`
-        }
+        },
+        body: JSON.stringify({
+          telegramBotToken: (telegramBotToken || '').trim(),
+          telegramChatId: (telegramChatId || '').trim()
+        })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Telegram test failed')
-      alert(data.message || 'Telegram test message sent successfully!')
+      alert(data.message || '✅ Telegram test alert sent successfully! Check your Telegram group/channel.')
     } catch (err) {
       alert('Telegram Test Error: ' + err.message)
     } finally {
@@ -238,9 +247,22 @@ export default function AdminSettingsDesk() {
     if (!user) return
     async function loadSettings() {
       try {
-        const snap = await getDoc(doc(db, 'settings', 'restaurant'))
-        if (snap.exists()) {
-          const data = snap.data()
+        let data = null
+        try {
+          const snap = await getDoc(doc(db, 'settings', 'restaurant'))
+          if (snap.exists()) data = snap.data()
+        } catch (_) {}
+
+        if (!data && accessToken) {
+          try {
+            const res = await fetch('/api/admin/settings', {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            })
+            if (res.ok) data = await res.json()
+          } catch (_) {}
+        }
+
+        if (data) {
           setRestaurantName(data.restaurantName || 'Biryani Badshah')
           setIsStoreOpen(data.isStoreOpen ?? true)
           setDeliveryCharge(data.deliveryCharge !== undefined ? String(data.deliveryCharge) : '40')
@@ -255,13 +277,16 @@ export default function AdminSettingsDesk() {
           setAnnouncementEnabled(Boolean(data.announcementEnabled))
           setAnnouncementText(data.announcementText || '')
           setAnnouncementType(data.announcementType || 'info')
+
+          setTelegramBotToken(data.telegramBotToken || '')
+          setTelegramChatId(data.telegramChatId || '')
         }
       } catch (e) {
         console.warn('Load settings notice:', e.message)
       }
     }
     loadSettings()
-  }, [user])
+  }, [user, accessToken])
 
   const handleSaveSettings = async (e) => {
     e.preventDefault()
@@ -283,8 +308,7 @@ export default function AdminSettingsDesk() {
     try {
       setSaving(true)
       const cleanAnnouncementText = announcementText.trim()
-
-      await setDoc(doc(db, 'settings', 'restaurant'), {
+      const payload = {
         restaurantName,
         isStoreOpen,
         deliveryCharge: Number(deliveryCharge) || 0,
@@ -298,10 +322,45 @@ export default function AdminSettingsDesk() {
         announcementEnabled,
         announcementText: cleanAnnouncementText,
         announcementType,
-        updatedAt: serverTimestamp()
-      }, { merge: true })
+        telegramBotToken: (telegramBotToken || '').trim(),
+        telegramChatId: (telegramChatId || '').trim(),
+      }
 
-      setMessage('✨ All Settings & Announcement published successfully! Changes are live across the website.')
+      // Priority 1: Save via authenticated server API (uses service account REST, immune to client security rule denials)
+      let serverSaved = false
+      try {
+        const res = await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(payload),
+        })
+        const resData = await res.json()
+        if (res.ok) {
+          serverSaved = true
+        } else {
+          console.warn('[Settings] Server save notice:', resData.error)
+        }
+      } catch (apiErr) {
+        console.warn('[Settings] Server save network notice:', apiErr.message)
+      }
+
+      // Priority 2: Client-side setDoc for instant local realtime cache
+      try {
+        await setDoc(doc(db, 'settings', 'restaurant'), {
+          ...payload,
+          updatedAt: serverTimestamp(),
+        }, { merge: true })
+      } catch (clientErr) {
+        if (!serverSaved) {
+          throw clientErr
+        }
+        console.warn('[Settings] Client Firestore write permission bypassed because server API succeeded.')
+      }
+
+      setMessage('✨ All Settings, Announcements & Bot Configurations saved successfully! Changes are live across the website.')
       setTimeout(() => setMessage(''), 4500)
     } catch (err) {
       alert('Error saving settings: ' + err.message)
@@ -495,6 +554,84 @@ export default function AdminSettingsDesk() {
                   <div style={{ fontSize: '0.76rem', color: '#6b7280' }}>Continuously repeat chime every 4s until admin taps Acknowledge</div>
                 </div>
               </label>
+            </div>
+
+            {/* TELEGRAM INSTANT ALERTS INTEGRATION */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(37, 99, 235, 0.08) 100%)',
+              border: '1.5px solid rgba(37, 99, 235, 0.25)',
+              borderRadius: '16px',
+              padding: '18px 20px',
+              marginBottom: '22px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '1.2rem' }}>✈️</span>
+                  <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 900, color: '#1e40af' }}>
+                    Telegram Order Alerts Bot (100% Free)
+                  </h4>
+                </div>
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 900,
+                  background: '#dbeafe',
+                  color: '#1e40af',
+                  padding: '3px 10px',
+                  borderRadius: '999px',
+                  letterSpacing: '0.04em'
+                }}>
+                  REALTIME DISPATCH
+                </span>
+              </div>
+
+              <p style={{ margin: '0 0 14px 0', fontSize: '0.82rem', color: '#1e3a8a', lineHeight: '1.45' }}>
+                Receive instant Telegram alerts with customer phone, delivery address, and order items directly in your phone or staff Telegram group.
+              </p>
+
+              <div className="adm-grid-2" style={{ gap: '14px', marginBottom: '12px' }}>
+                <div className="adm-field" style={{ margin: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1e3a8a', margin: 0 }}>
+                      TELEGRAM BOT TOKEN
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowBotToken(!showBotToken)}
+                      style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.72rem', fontWeight: 800, cursor: 'pointer', padding: 0 }}
+                    >
+                      {showBotToken ? '🙈 HIDE' : '👁️ SHOW'}
+                    </button>
+                  </div>
+                  <input
+                    type={showBotToken ? 'text' : 'password'}
+                    value={telegramBotToken}
+                    onChange={(e) => setTelegramBotToken(e.target.value)}
+                    placeholder="e.g. 8866699671:AAH..."
+                    className="adm-input"
+                    style={{ background: '#ffffff', borderColor: '#bfdbfe', fontSize: '0.84rem' }}
+                  />
+                </div>
+
+                <div className="adm-field" style={{ margin: 0 }}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1e3a8a', margin: 0 }}>
+                      TELEGRAM CHAT ID / GROUP ID
+                    </label>
+                  </div>
+                  <input
+                    type="text"
+                    value={telegramChatId}
+                    onChange={(e) => setTelegramChatId(e.target.value)}
+                    placeholder="e.g. 8940500188 or -100..."
+                    className="adm-input"
+                    style={{ background: '#ffffff', borderColor: '#bfdbfe', fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ fontSize: '0.75rem', color: '#475569', lineHeight: '1.4' }}>
+                💡 <b>Setup Guide:</b> 1. Message <b>@BotFather</b> on Telegram to create a bot & copy token. 2. Message <b>@userinfobot</b> to get your personal Chat ID or add the bot as Admin to your Telegram Group. 3. Enter both above and click <b>Test Telegram Bot</b> below!
+              </div>
             </div>
 
             {/* Test Action Buttons */}

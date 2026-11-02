@@ -6,14 +6,7 @@ async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const token = process.env.TELEGRAM_BOT_TOKEN
-  const chatId = process.env.TELEGRAM_CHAT_ID
-
-  if (!token || !chatId) {
-    return res.status(400).json({
-      error: 'Telegram Bot credentials not set in server environment. Please set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env.local'
-    })
-  }
+  const { telegramBotToken, telegramChatId } = req.body || {}
 
   const testMessage = `
 🔔 <b>TELEGRAM BOT TEST ALERT</b>
@@ -28,7 +21,7 @@ async function handler(req, res) {
 🎉 <i>You will receive instant alerts here whenever a new order is placed!</i>
 `.trim()
 
-  const result = await sendTelegramMessage(testMessage)
+  const result = await sendTelegramMessage(testMessage, telegramBotToken, telegramChatId)
 
   if (result.success) {
     return res.status(200).json({
@@ -36,8 +29,14 @@ async function handler(req, res) {
       message: '✅ Telegram test alert sent successfully! Check your Telegram group/channel.'
     })
   } else {
-    return res.status(500).json({
-      error: result.error || 'Failed to send Telegram test alert. Check Bot Token & Chat ID.'
+    let errorMsg = result.error || 'Failed to send Telegram test alert.'
+    if (errorMsg.includes('Unauthorized') || errorMsg.includes('invalid token') || errorMsg.includes('401')) {
+      errorMsg = 'Unauthorized: Expired or invalid token. Please ensure your Telegram bot token is correct and active. You can get or generate a fresh token from @BotFather on Telegram.'
+    } else if (errorMsg.includes('chat not found') || errorMsg.includes('400')) {
+      errorMsg = `Chat not found (${result.error}). Make sure your bot is added as an Admin to your Telegram group/channel, or send /start to your bot directly.`
+    }
+    return res.status(400).json({
+      error: errorMsg
     })
   }
 }

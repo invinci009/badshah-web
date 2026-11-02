@@ -117,7 +117,7 @@ export function AuthProvider({ children }) {
     return () => unsubscribe()
   }, [])
 
-  // Auto-restore session via HttpOnly refresh cookie on app mount
+  // Auto-restore session via HttpOnly refresh cookie on app mount and maintain freshness
   useEffect(() => {
     async function restoreSession() {
       try {
@@ -131,6 +131,10 @@ export function AuthProvider({ children }) {
       }
     }
     restoreSession()
+
+    // Periodically refresh access token every 10 minutes to prevent token expiration
+    const interval = setInterval(restoreSession, 10 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   // Sync token & user with backend API after Firebase login
