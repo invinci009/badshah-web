@@ -217,7 +217,7 @@ if (race === 'timeout') console.warn('Order write still in flight — finishing 
           }
         }
       }
-      syncOrderWithServer()
+      await syncOrderWithServer().catch(() => {})
 
       setCartItems([])
       setCheckoutOpen(false)

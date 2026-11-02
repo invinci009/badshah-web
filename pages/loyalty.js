@@ -52,11 +52,14 @@ export default function LoyaltyPage() {
       }
 
       const activePhone = phoneOverride || userProfile?.phone || user?.phoneNumber || ''
-      const url = activePhone
-        ? `/api/loyalty/summary?phone=${encodeURIComponent(activePhone)}`
-        : user?.uid
-        ? `/api/loyalty/summary?customerId=${encodeURIComponent(user.uid)}`
-        : null
+      const activeEmail = user?.email || userProfile?.email || ''
+      
+      const queryParts = []
+      if (activePhone) queryParts.push(`phone=${encodeURIComponent(activePhone)}`)
+      if (activeEmail) queryParts.push(`email=${encodeURIComponent(activeEmail)}`)
+      if (user?.uid) queryParts.push(`customerId=${encodeURIComponent(user.uid)}`)
+
+      const url = queryParts.length ? `/api/loyalty/summary?${queryParts.join('&')}` : null
 
       if (!url && !accessToken) {
         setLoading(false)

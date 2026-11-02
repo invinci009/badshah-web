@@ -14,24 +14,38 @@ export default async function handler(req, res) {
   try {
     let customerId = null
     let customerPhone = null
+    let customerEmail = req.query.email ? String(req.query.email).toLowerCase().trim() : null
 
-    // 1. Try decoding Bearer token if present
-    const authHeader = req.headers.authorization
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const decoded = verifyAccessToken(authHeader.split(' ')[1])
-      if (decoded) {
-        customerId = decoded.phone ? normalizePhone(decoded.phone) : (decoded.uid || decoded.email)
-        if (decoded.phone) customerPhone = normalizePhone(decoded.phone)
-      }
-    }
-
-    // 2. Query param phone fallback
+    // 1. Phone number is primary identity for Indian diner VIP accounts
     const queryPhone = req.query.phone
-    if (!customerId && queryPhone) {
+    if (queryPhone) {
       const norm = normalizePhone(queryPhone)
       if (norm) {
         customerId = norm
         customerPhone = norm
+      }
+    }
+
+    // 2. Try decoding Bearer token if present
+    const authHeader = req.headers.authorization
+    let tokenUid = null
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyAccessToken(authHeader.split(' ')[1])
+      if (decoded) {
+        if (decoded.email && !customerEmail) {
+          customerEmail = String(decoded.email).toLowerCase().trim()
+        }
+        if (decoded.phone && !customerPhone) {
+          const norm = normalizePhone(decoded.phone)
+          if (norm) {
+            customerPhone = norm
+            if (!customerId) customerId = norm
+          }
+        }
+        tokenUid = decoded.uid
+        if (!customerId) {
+          customerId = customerPhone || decoded.uid || decoded.email
+        }
       }
     }
 
@@ -40,12 +54,23 @@ export default async function handler(req, res) {
       customerId = String(req.query.customerId).trim()
     }
 
+    // 4. Fallback to email if still no customerId
+    if (!customerId && customerEmail) {
+      customerId = customerEmail
+    }
+
     if (!customerId) {
       return res.status(400).json({ error: 'Please sign in or provide a valid mobile number to view VIP Club points' })
     }
 
+    const userMeta = {
+      phone: customerPhone,
+      email: customerEmail,
+      userId: tokenUid || (req.query.customerId && !/^\d{10}$/.test(req.query.customerId) ? req.query.customerId : null),
+    }
+
     const [snapshotData, config] = await Promise.all([
-      getCustomerLoyaltySnapshot(customerId),
+      getCustomerLoyaltySnapshot(customerId, userMeta),
       getLoyaltyConfig(),
     ])
 

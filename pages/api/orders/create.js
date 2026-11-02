@@ -29,11 +29,13 @@ async function handler(req, res) {
   }
 
   try {
-    const { userId, userEmail, userName, userPhone, deliveryAddress, items } = req.body
+    const { userName, userPhone, deliveryAddress, items } = req.body
+    const userId = req.body.userId || req.user?.uid
+    const userEmail = req.body.userEmail || req.user?.email || req.body.customerEmail
 
     // Accept both naming conventions used across the app payload
-    const finalPhone = userPhone || req.body.customerPhone || null
-    const finalName  = userName  || req.body.customerName  || null
+    const finalPhone = userPhone || req.body.customerPhone || req.user?.phone || null
+    const finalName  = userName  || req.body.customerName  || req.user?.displayName || null
 
     // ── Auth guards ──────────────────────────────────────────────────────────
     if (!userId || !userEmail) {
@@ -244,10 +246,40 @@ async function handler(req, res) {
       }
     }
 
+    // ── Automatically Award Loyalty Points upon Successful Order Placement ───
+    let earnedLoyaltyPoints = 0
+    let loyaltyAwardStatus = false
+    try {
+      const { awardOrderPoints } = await import('../../../lib/loyalty')
+      const awardRes = await awardOrderPoints({
+        ...finalOrderRecord,
+        orderId,
+        customerPhone: finalPhone,
+        userPhone: finalPhone,
+        customerEmail: userEmail,
+        userEmail,
+        userId,
+      })
+      earnedLoyaltyPoints = awardRes.awarded || 0
+      loyaltyAwardStatus = awardRes.awarded > 0 || awardRes.reason === 'Points already awarded'
+    } catch (lErr) {
+      console.warn('Auto loyalty award notice on order create:', lErr.message)
+    }
+
+    // ── Auto-sync diner mobile to users profile non-blocking ──────────────────
+    if (userId && finalPhone) {
+      patchFirestoreDoc('users', userId, {
+        phone: finalPhone,
+        updatedAt: now,
+      }).catch(() => {})
+    }
+
     return res.status(200).json({
       success: true,
       message: 'Order created successfully',
       orderId,
+      loyaltyAwarded: loyaltyAwardStatus,
+      loyaltyPointsEarned: earnedLoyaltyPoints,
     })
   } catch (error) {
     console.error('Order Creation API Error:', error)
