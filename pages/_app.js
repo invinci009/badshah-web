@@ -6,39 +6,48 @@ import { SettingsProvider } from '../context/SettingsContext'
 import { OrdersProvider } from '../context/OrdersContext'
 import AuthModal from '../components/AuthModal'
 
+// Early global suppression for browser/network abort errors in dev & production
+if (typeof window !== 'undefined') {
+  const isHarmlessNetworkError = (err) => {
+    if (!err) return false
+    const msg = (err?.message || String(err || '')).toLowerCase()
+    const name = err?.name || ''
+    const stack = (err?.stack || '').toLowerCase()
+
+    return (
+      name === 'AbortError' ||
+      msg.includes('abort') ||
+      msg.includes('signal is aborted') ||
+      msg.includes('failed to fetch') ||
+      msg.includes('webchannel') ||
+      stack.includes('webchannel') ||
+      stack.includes('injectscriptadjust')
+    )
+  }
+
+  const handleGlobalRejection = (event) => {
+    if (isHarmlessNetworkError(event?.reason)) {
+      event.preventDefault()
+      if (typeof event.stopImmediatePropagation === 'function') {
+        event.stopImmediatePropagation()
+      }
+    }
+  }
+
+  const handleGlobalError = (event) => {
+    if (isHarmlessNetworkError(event?.error) || isHarmlessNetworkError(event?.message)) {
+      event.preventDefault()
+      if (typeof event.stopImmediatePropagation === 'function') {
+        event.stopImmediatePropagation()
+      }
+    }
+  }
+
+  window.addEventListener('unhandledrejection', handleGlobalRejection, true)
+  window.addEventListener('error', handleGlobalError, true)
+}
+
 export default function App({ Component, pageProps }) {
-  useEffect(() => {
-    // 1. Harmless Network Error Suppression
-    const handleUnhandledRejection = (event) => {
-      const reason = event?.reason
-      const msg = (reason?.message || String(reason || '')).toLowerCase()
-      const name = reason?.name || ''
-      const stack = (reason?.stack || '').toLowerCase()
-
-      const isHarmlessNetworkError =
-        name === 'AbortError' ||
-        msg.includes('failed to fetch') ||
-        msg.includes('signal is aborted') ||
-        msg.includes('webchannel') ||
-        msg.includes('aborted') ||
-        stack.includes('webchannel') ||
-        stack.includes('injectscriptadjust')
-
-      if (isHarmlessNetworkError) {
-        event.preventDefault()
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('unhandledrejection', handleUnhandledRejection)
-    }
-
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('unhandledrejection', handleUnhandledRejection)
-      }
-    }
-  }, [])
 
   return (
     <AuthProvider>
